@@ -1,5 +1,5 @@
 const $=(s,c=document)=>c.querySelector(s), $$=(s,c=document)=>[...c.querySelectorAll(s)];
-const intro=$("#intro"), body=document.body, music=$("#music"), musicBtn=$("#musicToggle"), toast=$("#toast");
+const intro=$("#intro"), body=document.body, toast=$("#toast");
 window.addEventListener("load",()=>setTimeout(()=>$(".loader")?.remove(),1800));
 
 // Decorative petals are generated once to keep animation lightweight.
@@ -7,26 +7,12 @@ const petals=$(".petals");
 for(let i=0;i<16;i++){const p=document.createElement("span");p.style.setProperty("--x",`${Math.random()*100}%`);p.style.setProperty("--d",`${9+Math.random()*10}s`);p.style.setProperty("--delay",`${-Math.random()*15}s`);petals.append(p)}
 
 function notify(message){toast.textContent=message;toast.classList.add("show");clearTimeout(notify.timer);notify.timer=setTimeout(()=>toast.classList.remove("show"),2200)}
-async function tryMusic(){
-  if(!music.src){
-    try{
-      const response=await fetch(music.dataset.src,{method:"HEAD"});
-      if(!response.ok)throw new Error("missing");
-      music.src=music.dataset.src;
-    }catch{notify("Add wedding-music.mp3 to assets/music to enable music.");return}
-  }
-  music.volume=.28;
-  try{await music.play();musicBtn.classList.add("playing");musicBtn.setAttribute("aria-label","Pause background music")}
-  catch{musicBtn.classList.remove("playing");notify("Add wedding-music.mp3 to assets/music to enable music.")}
-}
 function openInvitation(){
   intro.classList.add("opening");body.classList.remove("intro-open");
-  setTimeout(()=>{intro.classList.add("hidden");$("#home").scrollIntoView()},1200);tryMusic()
+  setTimeout(()=>{intro.classList.add("hidden");$("#home").scrollIntoView()},1200)
 }
 $("#openInvitation").addEventListener("click",openInvitation);
 $("#replay").addEventListener("click",()=>{intro.classList.remove("hidden","opening");body.classList.add("intro-open");window.scrollTo({top:0});});
-music.addEventListener("error",()=>musicBtn.classList.add("unavailable"));
-musicBtn.addEventListener("click",async()=>{if(music.paused)tryMusic();else{music.pause();musicBtn.classList.remove("playing");musicBtn.setAttribute("aria-label","Play background music")}});
 
 const header=$("#siteHeader"), menu=$(".menu-toggle");
 window.addEventListener("scroll",()=>header.classList.toggle("scrolled",scrollY>40),{passive:true});
